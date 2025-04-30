@@ -1,56 +1,35 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 
 const Upload = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [conditionMet, setConditionMet] = useState(false);
+  const navigate = useNavigate();
 
-	const onFileChange = (event) => {
-		setSelectedFile(event.target.files[0]);
-	};
-  
-	const onFileUpload = () => {
-		const formData = new FormData();
-		formData.append(
-			"myFile",
-			selectedFile,
-			selectedFile.name
-		);
-		console.log(selectedFile);
-		axios.post("api/uploadfile", formData);
-	};
+  const handleClick = () => {
+    if (conditionMet) {
+      navigate('/characters');
+    }
+  };
 
-	const fileData = () => {
-		if (selectedFile) {
-			return (
-				<div>
-					<h2>File Details:</h2>
-					<p>File Name: {selectedFile.name}</p>
-					<p>File Type: {selectedFile.type}</p>
-					<p>
-						Last Modified: {selectedFile.lastModifiedDate.toDateString()}
-					</p>
-				</div>
-			);
-		} else {
-			return (
-				<div>
-					<br />
-					<h4>Choose before Pressing the Upload button</h4>
-				</div>
-			);
-		}
-	};
-
-	return (
-		<div>
-			<h3>Upload .ttf File Here</h3>
-			<div>
-				<input type="file" onChange={onFileChange} />
-				<button onClick={onFileUpload}>Upload</button>
-			</div>
-			{fileData()}
-		</div>
-	);
+  return (
+    <div className="grid items-center justify-center gap-1.5">
+      <h1 className="text-2l font-bold">Welcome to BezierBox</h1>
+		<Label htmlFor="ttf-file">Select a TTF File</Label>
+	  	<Input id="ttf-file" type="file" accept=".ttf" onChange={(e) => {
+				if (e.target.files.length > 0) {
+					setConditionMet(true);
+				}
+			}}
+		/>
+      	<Button onClick={handleClick} disabled={!conditionMet}>
+        Confirm File Choice
+      </Button>
+    </div>
+  );
 };
 
 export default Upload;
