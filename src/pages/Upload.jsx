@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { extract_glyphs_WASM, get_glyph_index_map_WASM, is_loaded_WASM, load_WASM, open_font_WASM } from '@/lib/wasm/glyph_module';
 import { useAtom } from 'jotai';
-import { fileLoaded, filename, glyphs, index_map } from '@/lib/atoms';
+import { fileLoaded, filename, glyf, index_map } from '@/lib/atoms';
 
 
 const Upload = () => {
@@ -15,7 +15,7 @@ const Upload = () => {
 
   const [, setLoaded] = useAtom(fileLoaded);
   const [, setName] = useAtom(filename);
-  const [, setGlyphs] = useAtom(glyphs);
+  const [, setGlyphs] = useAtom(glyf);
   const [, setIndexMap] = useAtom(index_map);
 
   const handleInput = () => {
@@ -29,11 +29,11 @@ const Upload = () => {
       }
     
       await open_font_WASM(fileRef.current.files[0]);
-      const glyf = extract_glyphs_WASM();
+      const glyphs = extract_glyphs_WASM();
       const indices = get_glyph_index_map_WASM();
     
       setName((draft) => { return fileRef.current.files[0].name });
-      setGlyphs((draft) => { return glyf });
+      setGlyphs((draft) => { return glyphs });
       setIndexMap((draft) => { return indices });
       setLoaded((draft) => { return true });
 

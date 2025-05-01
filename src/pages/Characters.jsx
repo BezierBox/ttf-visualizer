@@ -4,13 +4,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import GridButtons from "./GridButtons";
+import GridButtons from "../components/GridButtons";
 import { useNavigate } from 'react-router-dom';
+import { useAtom } from "jotai";
+import { glyf, glyf_nums } from "@/lib/atoms";
 
 
 const Characters = () => {
     const navigate = useNavigate();
-    const characters = ["A", "B", "C", "D", "E", "F", "G", "H", "anything works"];
+    const [glyphNums] = useAtom(glyf_nums);
 
     const handleSave = () => {
         navigate('/');
@@ -20,7 +22,7 @@ const Characters = () => {
 		<div className="grid gap-2">
             <h3 className="text-xl font-bold leading-none">Choose a Glyph to Render</h3>
             <Button onClick={handleSave}>Save TTF File</Button>
-            <GridButtons items={characters} />
+            <GridButtons items={glyphNums} />
         </div>
 	);
 };
