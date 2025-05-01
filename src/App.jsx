@@ -6,7 +6,11 @@ import Characters from '@/pages/Characters.jsx'
 import Renderer from '@/pages/Renderer'
 
 
+import { load_WASM } from "./lib/wasm/glyph_module.js";
+
 const App = () => {
+  load_WASM();
+
   return (
     <div>
       <BrowserRouter>
