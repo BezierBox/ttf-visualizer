@@ -19,25 +19,28 @@ export const is_loaded_WASM = () => {
   return Module != undefined;
 };
 
-export const open_font_WASM = (file) => {
-  if (Module == undefined) {
-    throw Error("Attempted to open font with undefined module");
-  }
-
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const data = new Uint8Array(e.target.result);
-    const filename = `/tmp/${file.name}`;
-
-    // Write file to virtual filesystem
-    Module.FS.writeFile(filename, data);
-
-    // Call your C++ function via ccall
-    Module.open_font(filename);
-  };
-  reader.readAsArrayBuffer(file);
+export const open_font_WASM = async (file) => {
+  return new Promise((resolve, reject) => {
+    if (Module == undefined) {
+      reject("Attempted to open font with undefined module");
+    }
+  
+    if (!file) { reject("No file was provided") };
+  
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const data = new Uint8Array(e.target.result);
+      const filename = `/tmp/${file.name}`;
+  
+      // Write file to virtual filesystem
+      Module.FS.writeFile(filename, data);
+  
+      // Call your C++ function via ccall
+      Module.open_font(filename);
+      resolve();
+    };
+    reader.readAsArrayBuffer(file);
+  })
 };
 
 export const get_glyph_index_map_WASM = () => {
@@ -49,11 +52,12 @@ export const get_glyph_index_map_WASM = () => {
   const key_map = glyph_map.keys();
 
   const js_map = {};
-  for (const key of key_map) {
+  for (let i = 0; i < key_map.size(); i++) {
+    const key = key_map.get(i);
     const unicode_vec = glyph_map.get(key);
     const inner_array = [];
-    for (let i = 0; i < unicode_vec.size(); i++) {
-      inner_array.push(unicode_vec.get(i));
+    for (let j = 0; j < unicode_vec.size(); j++) {
+      inner_array.push(unicode_vec.get(j));
     }
     unicode_vec.delete();
     js_map[key] = inner_array;
@@ -100,24 +104,27 @@ export const extract_glyphs_WASM = () => {
   }
 
   const c_map = Module.extract_glyphs();
-  const key_map = c_map.keys();
+  // console.log(c_map);
+  // const key_map = c_map;
   const j_map = {};
 
-  for (const key of key_map) {
-    const c_glyph = c_map.get(key);
+  // console.log(key_map);
+
+  for (let i = 0; i < c_map.size(); i++) {
+    const c_glyph = c_map.get(i);
     const j_glyph = [];
-    for (let i = 0; i < c_glyph.size(); i++) {
-      const c_inner = c_glyph.get(i);
+    for (let j = 0; j < c_glyph.size(); j++) {
+      const c_inner = c_glyph.get(j);
       const j_inner = [];
 
-      for (let j = 0; j < c_inner.size(); j++) {
-        j_inner.push(c_inner.get(j));
+      for (let k = 0; k < c_inner.size(); k++) {
+        j_inner.push(c_inner.get(k));
       }
       c_inner.delete();
       j_glyph.push(j_inner);
     }
     c_glyph.delete();
-    j_map[key] = j_glyph;
+    j_map[i] = j_glyph;
   }
   return j_map;
 };
