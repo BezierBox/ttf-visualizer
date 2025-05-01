@@ -17,7 +17,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Upload />} />
             <Route path="/characters" element={<Characters />} />
-            <Route path="/renderer" element={<Renderer />} />
+            <Route path="/renderer/:glyf" element={<Renderer />} />
           </Routes>
       </BrowserRouter>
     </div>
