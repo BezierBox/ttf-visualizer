@@ -16,7 +16,6 @@ const Canvas = ({
   const canvasRef = useRef(null);
   const [scaleInfo, setScaleInfo] = useState(null);
   const [dragging, setDragging] = useState(null);
-  const [glyphImage, setGlyphImage] = useState(null); // State to store the image URL
 
   useEffect(() => {
     if (!glyph) return;
