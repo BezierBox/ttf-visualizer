@@ -5,9 +5,21 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { produce } from "immer";
 
-const PointColumn = ({ selectedPoint, setSelectedPoint, glyph, setGlyph }) => {
+const PointColumn = ({
+  selectedPoint,
+  glyph,
+  setGlyph,
+  setHistory,
+  setFuture,
+}) => {
   //handle updating coords
   const handleCoordChange = (shape, point, axis, value) => {
+    setHistory(
+      produce((draft) => {
+        draft.push(glyph);
+      }),
+    );
+    setFuture([]);
     setGlyph(
       produce((draft) => {
         draft[shape][point][axis] = parseFloat(value);
@@ -17,6 +29,12 @@ const PointColumn = ({ selectedPoint, setSelectedPoint, glyph, setGlyph }) => {
 
   //change on-curve to off-curve, vice versa
   const handleToggleCurve = (shape, point) => {
+    setHistory(
+      produce((draft) => {
+        draft.push(glyph);
+      }),
+    );
+    setFuture([]);
     setGlyph(
       produce((draft) => {
         draft[shape][point].onCurve = !draft[shape][point].onCurve;
@@ -25,6 +43,12 @@ const PointColumn = ({ selectedPoint, setSelectedPoint, glyph, setGlyph }) => {
   };
 
   const removeCoordinate = (shape, point) => {
+    setHistory(
+      produce((draft) => {
+        draft.push(glyph);
+      }),
+    );
+    setFuture([]);
     setGlyph(
       produce((draft) => {
         delete draft[shape][point];

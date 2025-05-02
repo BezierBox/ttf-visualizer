@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import React, { useEffect, useRef, useState } from "react";
 
 const Canvas = ({
@@ -5,17 +6,15 @@ const Canvas = ({
   setGlyph,
   selectedPoint,
   setSelectedPoint,
+  history,
+  setHistory,
+  future,
+  setFuture,
   className,
 }) => {
   const canvasRef = useRef(null);
   const [scaleInfo, setScaleInfo] = useState(null);
   const [dragging, setDragging] = useState(null);
-
-  //for undo/redo
-  const [history, setHistory] = useState([]);
-  const [future, setFuture] = useState([]);
-
-  
 
   useEffect(() => {
     if (!glyph) return;
@@ -175,11 +174,13 @@ const Canvas = ({
     const nearest = findNearestPoint(x, y);
     if (nearest) {
       //save state before editing
-      setGlyph(prev => {
-        setHistory(h => [...h, JSON.parse(JSON.stringify(prev))]);
-        return prev;
-      });
-  
+      setHistory(
+        produce((draft) => {
+          draft.push(JSON.parse(JSON.stringify(glyph)));
+        }),
+      );
+      setFuture([]);
+
       setDragging(nearest);
       setSelectedPoint(nearest);
     }
@@ -196,32 +197,6 @@ const Canvas = ({
       return updated;
     });
   };
-
-  const updateGlyph = (updater) => {
-  setGlyph((prev) => {
-    const prevClone = JSON.parse(JSON.stringify(prev));
-    const nextGlyph = updater(prevClone);
-    setHistory((h) => [...h, prev]);
-    setFuture([]); // Clear redo stack
-    return nextGlyph;
-  });
-};
-
-const handleUndo = () => {
-  if (history.length === 0) return;
-  const prev = history[history.length - 1];
-  setHistory((h) => h.slice(0, -1));
-  setFuture((f) => [glyph, ...f]);
-  setGlyph(prev);
-};
-
-const handleRedo = () => {
-  if (future.length === 0) return;
-  const next = future[0];
-  setFuture((f) => f.slice(1));
-  setHistory((h) => [...h, glyph]);
-  setGlyph(next);
-};
 
   const handleMouseUp = () => setDragging(null);
 
