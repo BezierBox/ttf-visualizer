@@ -26,21 +26,33 @@ const Renderer = () => {
   const [selected, setSelected] = useState(null);
 
   const handleClick = () => {
+    setGlyphs((draft) => {
+      draft[glyph] = points;
+    });
+
     navigate("/characters");
   };
 
   return (
-    <div>
-      <h1 className="text-xl font-bold leading-none">Bezier Glyph Renderer</h1>
-      <p>Chosen Character: {chars}</p>
-      <Button onClick={handleClick}>Save Glyph</Button>
-      <div class="flex flex-row min-h-screen justify-center items-center gap-5">
-        <Canvas
-          glyph={points}
-          setGlyph={setPoints}
-          selectedPoint={selected}
-          setSelectedPoint={setSelected}
-        />
+    <div className="">
+      <h1 className="text-3xl font-bold leading-none">Bezier Glyph Renderer</h1>
+      <h2 className="text-xl">Chosen Character: {chars}</h2>
+      <div class="flex flex-row h-[calc(100vh-10rem)] max-h-screen justify-center items-center gap-5">
+        <div className="relative h-1/2">
+          <Canvas
+            glyph={points}
+            setGlyph={setPoints}
+            selectedPoint={selected}
+            setSelectedPoint={setSelected}
+            className={`mt-20`}
+          />
+          <Button
+            className={`absolute w-full h-12 bottom-0 left-0`}
+            onClick={handleClick}
+          >
+            Save Glyph
+          </Button>
+        </div>
         <PointColumn
           glyph={points}
           setGlyph={setPoints}

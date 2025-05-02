@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const Canvas = ({ glyph, setGlyph, selectedPoint, setSelectedPoint }) => {
+const Canvas = ({
+  glyph,
+  setGlyph,
+  selectedPoint,
+  setSelectedPoint,
+  className,
+}) => {
   const canvasRef = useRef(null);
   const [scaleInfo, setScaleInfo] = useState(null);
   const [dragging, setDragging] = useState(null);
@@ -182,6 +188,7 @@ const Canvas = ({ glyph, setGlyph, selectedPoint, setSelectedPoint }) => {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      className={className ?? ""}
     />
   );
 };
