@@ -1,17 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const Canvas = () => {
+const Canvas = ({ glyph, setGlyph, selectedPoint, setSelectedPoint }) => {
   const canvasRef = useRef(null);
-  const [glyph, setGlyph] = useState(null); //changed to useState 
   const [scaleInfo, setScaleInfo] = useState(null);
   const [dragging, setDragging] = useState(null);
-  const [selectedPoint, setSelectedPoint] = useState(null);
-
-  useEffect(() => {
-    fetch("/glyph.json")
-      .then(res => res.json())
-      .then(data => setGlyph(data));
-  }, []);
 
   useEffect(() => {
     if (!glyph) return;
@@ -24,8 +16,11 @@ const Canvas = () => {
     const { width, height } = canvas;
 
     // compute bounding box and scaling
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    glyph.contours.flat().forEach(p => {
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    glyph.flat().forEach((p) => {
       minX = Math.min(minX, p.x);
       minY = Math.min(minY, p.y);
       maxX = Math.max(maxX, p.x);
@@ -34,7 +29,10 @@ const Canvas = () => {
 
     const glyphWidth = maxX - minX;
     const glyphHeight = maxY - minY;
-    const scale = Math.min(width * 0.8 / glyphWidth, height * 0.8 / glyphHeight);
+    const scale = Math.min(
+      (width * 0.8) / glyphWidth,
+      (height * 0.8) / glyphHeight,
+    );
     const offsetX = (width - glyphWidth * scale) / 2 - minX * scale;
     const offsetY = (height - glyphHeight * scale) / 2 - minY * scale;
     setScaleInfo({ scale, offsetX, offsetY });
@@ -49,7 +47,7 @@ const Canvas = () => {
 
     // draw glyph outlines with quadratic curves
     ctx.beginPath();
-    for (let contour of glyph.contours) {
+    for (let contour of glyph) {
       if (contour.length === 0) continue;
 
       const points = contour.slice();
@@ -78,7 +76,8 @@ const Canvas = () => {
           i++;
         } else if (p1.onCurve && !p2.onCurve) {
           const p3 = points[(i + 1) % points.length];
-          let ctrl = p2, end;
+          let ctrl = p2,
+            end;
 
           if (p3.onCurve) {
             end = p3;
@@ -87,7 +86,7 @@ const Canvas = () => {
             end = {
               x: (p2.x + p3.x) / 2,
               y: (p2.y + p3.y) / 2,
-              onCurve: true
+              onCurve: true,
             };
             points.splice(i + 1, 0, end);
             i += 2;
@@ -109,12 +108,12 @@ const Canvas = () => {
     ctx.stroke();
 
     // draw draggable points
-    for (let ci = 0; ci < glyph.contours.length; ci++) {
-      for (let pi = 0; pi < glyph.contours[ci].length; pi++) {
-        const pt = transform(glyph.contours[ci][pi]);
+    for (let ci = 0; ci < glyph.length; ci++) {
+      for (let pi = 0; pi < glyph[ci].length; pi++) {
+        const pt = transform(glyph[ci][pi]);
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = glyph.contours[ci][pi].onCurve ? "#8EEAF4" : "#D020D0";
+        ctx.fillStyle = glyph[ci][pi].onCurve ? "#8EEAF4" : "#D020D0";
         ctx.fill();
       }
     }
@@ -138,9 +137,9 @@ const Canvas = () => {
 
   const findNearestPoint = (x, y) => {
     const { scale, offsetX, offsetY } = scaleInfo;
-    for (let ci = 0; ci < glyph.contours.length; ci++) {
-      for (let pi = 0; pi < glyph.contours[ci].length; pi++) {
-        const pt = glyph.contours[ci][pi];
+    for (let ci = 0; ci < glyph.length; ci++) {
+      for (let pi = 0; pi < glyph[ci].length; pi++) {
+        const pt = glyph[ci][pi];
         const tx = pt.x * scale + offsetX;
         const ty = canvasRef.current.height - (pt.y * scale + offsetY);
         if (Math.hypot(tx - x, ty - y) < 8) return { ci, pi };
@@ -163,64 +162,27 @@ const Canvas = () => {
     if (!dragging || !scaleInfo) return;
     const { x, y } = getMousePos(e);
     const newPt = inverseTransform(x, y);
-    setGlyph(prev => {
+    setGlyph((prev) => {
       const updated = JSON.parse(JSON.stringify(prev));
-      updated.contours[dragging.ci][dragging.pi].x = newPt.x;
-      updated.contours[dragging.ci][dragging.pi].y = newPt.y;
+      updated[dragging.ci][dragging.pi].x = newPt.x;
+      updated[dragging.ci][dragging.pi].y = newPt.y;
       return updated;
     });
   };
 
   const handleMouseUp = () => setDragging(null);
 
-  //handle updating coords
-  const handleCoordChange = (axis, value) => {
-    if (!selectedPoint) return;
-    setGlyph(prev => {
-      const updated = JSON.parse(JSON.stringify(prev));
-      updated.contours[selectedPoint.ci][selectedPoint.pi][axis] = parseFloat(value);
-      return updated;
-    });
-  };
-
-  //change on-curve to off-curve, vice versa
-  const handleToggleCurve = () => {
-    if (!selectedPoint) return;
-    setGlyph(prev => {
-      const updated = JSON.parse(JSON.stringify(prev));
-      const pt = updated.contours[selectedPoint.ci][selectedPoint.pi];
-      pt.onCurve = !pt.onCurve;
-      return updated;
-    });
-  };
-
-  const selected = selectedPoint && glyph?.contours[selectedPoint.ci]?.[selectedPoint.pi];
-
   return (
-    <div style={{ display: "flex", gap: "1rem" }}>
-      <canvas
-        ref={canvasRef}
-        width={400}
-        height={400}
-        style={{ border: "1px solid #aaa", cursor: "pointer" }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      />
-      <div>
-        <h3>Selected Point</h3>
-        {selected ? (
-          <>
-            <label>X: <input type="number" value={selected.x} onChange={e => handleCoordChange("x", e.target.value)} /></label><br />
-            <label>Y: <input type="number" value={selected.y} onChange={e => handleCoordChange("y", e.target.value)} /></label><br />
-            <button onClick={handleToggleCurve}>
-              Toggle {selected.onCurve ? "Off-Curve" : "On-Curve"}
-            </button>
-          </>
-        ) : <p>No point selected</p>}
-      </div>
-    </div>
+    <canvas
+      ref={canvasRef}
+      width={400}
+      height={400}
+      style={{ border: "1px solid #aaa", cursor: "pointer" }}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    />
   );
 };
 
