@@ -16,6 +16,9 @@ const Renderer = () => {
   const [indexMap] = useAtom(index_map);
   const [glyphs, setGlyphs] = useAtom(glyf);
   const { glyph } = useParams();
+
+  //for draw
+  const [drawStrokes, setDrawStrokes] = useState([]);
   if (glyph in glyphs == false) {
     navigate("/characters");
   }
@@ -54,6 +57,7 @@ const Renderer = () => {
               className={`ml-auto`}
             />
           </div>
+          
           <Canvas
             glyph={points}
             setGlyph={setPoints}
@@ -63,6 +67,8 @@ const Renderer = () => {
             setHistory={setHistory}
             future={future}
             setFuture={setFuture}
+            drawStrokes={drawStrokes}
+            setDrawStrokes={setDrawStrokes}
             className={`mt-1`}
           />
           <Button

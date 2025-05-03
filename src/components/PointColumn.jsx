@@ -1,4 +1,4 @@
-import { RouteIcon, RouteOff, RouteOffIcon } from "lucide-react";
+import { RouteIcon, RouteOffIcon, Trash2 } from "lucide-react";
 import React from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -12,7 +12,7 @@ const PointColumn = ({
   setHistory,
   setFuture,
 }) => {
-  //handle updating coords
+  // handle updating coords
   const handleCoordChange = (shape, point, axis, value) => {
     setHistory(
       produce((draft) => {
@@ -27,7 +27,7 @@ const PointColumn = ({
     );
   };
 
-  //change on-curve to off-curve, vice versa
+  // change on-curve to off-curve, vice versa
   const handleToggleCurve = (shape, point) => {
     setHistory(
       produce((draft) => {
@@ -45,13 +45,13 @@ const PointColumn = ({
   const removeCoordinate = (shape, point) => {
     setHistory(
       produce((draft) => {
-        draft.push(glyph);
+        draft.push(glyph); //save current state for undo
       }),
     );
-    setFuture([]);
+    setFuture([]); //clear future stack for redo
     setGlyph(
       produce((draft) => {
-        delete draft[shape][point];
+        draft[shape] = draft[shape].filter((_, i) => i !== point); //remove point
       }),
     );
   };
@@ -65,7 +65,13 @@ const PointColumn = ({
         shape.map((coord, index2) => (
           <div
             key={`coord-${index}-${index2}`}
-            className={`p-2 m-2 rounded-md ${selectedPoint && selectedPoint.ci == index && selectedPoint.pi == index2 ? "bg-blue-50" : "bg-white"}`}
+            className={`p-2 m-2 rounded-md ${
+              selectedPoint &&
+              selectedPoint.ci === index &&
+              selectedPoint.pi === index2
+                ? "bg-blue-50"
+                : "bg-white"
+            }`}
           >
             <Label className="text-sm">Point {index + index2 + 1}</Label>
             <div className="flex gap-2">
@@ -76,7 +82,7 @@ const PointColumn = ({
                   handleCoordChange(index, index2, "x", e.target.value)
                 }
                 placeholder="X"
-                className={`bg-white`}
+                className="bg-white"
               />
               <Input
                 type="number"
@@ -85,7 +91,7 @@ const PointColumn = ({
                   handleCoordChange(index, index2, "y", e.target.value)
                 }
                 placeholder="Y"
-                className={`bg-white`}
+                className="bg-white"
               />
               <Button
                 className={
@@ -98,12 +104,13 @@ const PointColumn = ({
               >
                 {coord.onCurve ? <RouteIcon /> : <RouteOffIcon />}
               </Button>
-              {/* <Button
+              <Button
                 variant="destructive"
                 onClick={() => removeCoordinate(index, index2)}
+                aria-label="Delete point"
               >
-                ✕
-              </Button> */}
+                <Trash2 size={18} />
+              </Button>
             </div>
           </div>
         )),

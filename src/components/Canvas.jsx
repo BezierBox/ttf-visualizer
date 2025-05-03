@@ -16,6 +16,7 @@ const Canvas = ({
   const [scaleInfo, setScaleInfo] = useState(null);
   const [dragging, setDragging] = useState(null);
 
+
   useEffect(() => {
     if (!glyph) return;
     draw();
@@ -128,7 +129,67 @@ const Canvas = ({
         ctx.fill();
       }
     }
+    // draw gray control handles
+for (let contour of glyph) {
+  const points = contour.slice();
+  const first = points[0], last = points[points.length - 1];
+
+  if (!first.onCurve && !last.onCurve) {
+    const mid = {
+      x: (first.x + last.x) / 2,
+      y: (first.y + last.y) / 2,
+      onCurve: true,
+    };
+    points.unshift(mid);
+  }
+
+  let i = 0;
+  let curr = points[i++];
+  while (i < points.length) {
+    const p1 = curr;
+    const p2 = points[i % points.length];
+
+
+    //if A oncurve, B offcurve 
+    if (p1.onCurve && !p2.onCurve) {
+      const p3 = points[(i + 1) % points.length];
+      let ctrl = p2, end;
+
+      //if C on curve, end line
+      if (p3.onCurve) {
+        end = p3;
+
+        //interpolate
+      } else {
+        end = {
+          x: (p2.x + p3.x) / 2,
+          y: (p2.y + p3.y) / 2,
+          onCurve: true
+        };
+      }
+
+      const tp1 = transform(p1);
+      const cp = transform(ctrl);
+      const ep = transform(end);
+
+      ctx.beginPath();
+      ctx.moveTo(tp1.x, tp1.y);
+      ctx.lineTo(cp.x, cp.y);
+      ctx.lineTo(ep.x, ep.y);
+      ctx.strokeStyle = "gray";
+      ctx.stroke();
+    }
+
+    curr = p2;
+    i++;
+  }
+}
+
+    
+
+    
   };
+  
 
   const getMousePos = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
@@ -199,6 +260,7 @@ const Canvas = ({
   };
 
   const handleMouseUp = () => setDragging(null);
+  
 
   return (
     <canvas
