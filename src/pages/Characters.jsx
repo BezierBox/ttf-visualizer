@@ -19,11 +19,15 @@ const Characters = () => {
 
   return (
     <div className="grid gap-2">
-      <h3 className="text-xl font-bold leading-none">
+      <h1 className="text-7xl font-bold leading-none">
         Choose a Glyph to Render
-      </h3>
-      <Button onClick={handleSave}>Save TTF File</Button>
+      </h1>
       <GridButtons items={glyphNums} />
+      <div className="fixed flex bottom-0 left-0 w-full h-16 bg-white items-center justify-center border-t-2 border-gray-900">
+        <Button onClick={handleSave} className={`grow mx-2 text-3xl h-12`}>
+          Save TTF File
+        </Button>
+      </div>
     </div>
   );
 };
