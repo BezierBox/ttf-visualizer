@@ -1,6 +1,5 @@
 import { produce } from "immer";
 import React, { useEffect, useRef, useState } from "react";
-import { renderGlyphToImage } from "../backend/renderGlyphToImage";
 
 const Canvas = ({
   glyph,

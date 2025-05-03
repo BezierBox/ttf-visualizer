@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Canvas from "@/components/Canvas.jsx";
-import CoordinateColumn from "@/pages/CoordinateColumn";
 import { useLocation, useParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

@@ -5,8 +5,11 @@ export const renderGlyphToImage = (glyph, width = 100, height = 100) => {
   const ctx = offscreenCanvas.getContext("2d");
 
   // Compute bounding box and scaling
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  glyph.contours.flat().forEach(p => {
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
+  glyph.contours.flat().forEach((p) => {
     minX = Math.min(minX, p.x);
     minY = Math.min(minY, p.y);
     maxX = Math.max(maxX, p.x);
@@ -15,7 +18,10 @@ export const renderGlyphToImage = (glyph, width = 100, height = 100) => {
 
   const glyphWidth = maxX - minX;
   const glyphHeight = maxY - minY;
-  const scale = Math.min(width * 0.8 / glyphWidth, height * 0.8 / glyphHeight);
+  const scale = Math.min(
+    (width * 0.8) / glyphWidth,
+    (height * 0.8) / glyphHeight,
+  );
   const offsetX = (width - glyphWidth * scale) / 2 - minX * scale;
   const offsetY = (height - glyphHeight * scale) / 2 - minY * scale;
 
@@ -27,7 +33,7 @@ export const renderGlyphToImage = (glyph, width = 100, height = 100) => {
   // Clear and draw glyph
   ctx.clearRect(0, 0, width, height);
   ctx.lineWidth = 1;
-  ctx.strokeStyle = "black";
+  ctx.strokeStyle = "white";
 
   ctx.beginPath();
   for (let contour of glyph.contours) {
@@ -59,7 +65,8 @@ export const renderGlyphToImage = (glyph, width = 100, height = 100) => {
         i++;
       } else if (p1.onCurve && !p2.onCurve) {
         const p3 = points[(i + 1) % points.length];
-        let ctrl = p2, end;
+        let ctrl = p2,
+          end;
 
         if (p3.onCurve) {
           end = p3;
@@ -68,7 +75,7 @@ export const renderGlyphToImage = (glyph, width = 100, height = 100) => {
           end = {
             x: (p2.x + p3.x) / 2,
             y: (p2.y + p3.y) / 2,
-            onCurve: true
+            onCurve: true,
           };
           points.splice(i + 1, 0, end);
           i += 2;
@@ -89,20 +96,20 @@ export const renderGlyphToImage = (glyph, width = 100, height = 100) => {
   ctx.stroke();
 
   // Draw points
-  for (let ci = 0; ci < glyph.contours.length; ci++) {
-    for (let pi = 0; pi < glyph.contours[ci].length; pi++) {
-      const pt = transform(glyph.contours[ci][pi]);
-      ctx.beginPath();
-      ctx.arc(pt.x, pt.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = glyph.contours[ci][pi].onCurve ? "#8EEAF4" : "#D020D0";
-      ctx.fill();
-    }
-  }
+  // for (let ci = 0; ci < glyph.contours.length; ci++) {
+  //   for (let pi = 0; pi < glyph.contours[ci].length; pi++) {
+  //     const pt = transform(glyph.contours[ci][pi]);
+  //     ctx.beginPath();
+  //     ctx.arc(pt.x, pt.y, 3, 0, 2 * Math.PI);
+  //     ctx.fillStyle = glyph.contours[ci][pi].onCurve ? "#8EEAF4" : "#D020D0";
+  //     ctx.fill();
+  //   }
+  // }
 
   // Convert to data URL
   return offscreenCanvas.toDataURL();
 };
 
 export const renderAllGlyphs = (glyphs) => {
-  return glyphs.map(glyph => renderGlyphToImage(glyph));
+  return glyphs.map((glyph) => renderGlyphToImage(glyph));
 };
