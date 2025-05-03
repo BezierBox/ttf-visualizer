@@ -259,8 +259,8 @@ const Canvas = ({
   return (
     <canvas
       ref={canvasRef}
-      width={800}
-      height={800}
+      width={400}
+      height={400}
       style={{ border: "1px solid #aaa", cursor: "pointer" }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
