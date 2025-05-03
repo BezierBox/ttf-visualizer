@@ -7,16 +7,16 @@ import { Separator } from "@/components/ui/separator";
 import GridButtons from "../components/GridButtons";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
-import { glyf, glyf_nums } from "@/lib/atoms";
+import { glyf, glyf_nums, output } from "@/lib/atoms";
 import { write_entries_WASM } from "@/lib/wasm/glyph_module";
 
 const Characters = () => {
   const navigate = useNavigate();
-  const [glyphs] = useAtom(glyf);
+  const [out] = useAtom(output);
   const [glyphNums] = useAtom(glyf_nums);
 
   const handleSave = () => {
-    write_entries_WASM(glyphs, () => {
+    write_entries_WASM(out, () => {
       navigate("/");
     });
   };

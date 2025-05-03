@@ -137,21 +137,22 @@ export const write_entries_WASM = (state, next) => {
   }
   const state_keys = Object.keys(state);
 
-  const input = new Module.VectorVectorWBPoint();
-  // for (const key of state_keys) {
-  const glyph = state[36];
-  const vec = new Module.VectorWBPoint();
-  for (let i = 0; i < glyph.length; i++) {
-    for (let j = 0; j < glyph[i].length; j++) {
-      vec.push_back({
-        x: glyph[i][j].x,
-        y: glyph[i][j].y,
-        onCurve: glyph[i][j].onCurve,
-        endPt: j == glyph[i].length - 1,
-      });
+  const input = new Module.MapUint16VectorWBPoint();
+  for (const key of state_keys) {
+    const glyph = state[key];
+    const ind = parseInt(key);
+    const vec = new Module.VectorWBPoint();
+    for (let i = 0; i < glyph.length; i++) {
+      for (let j = 0; j < glyph[i].length; j++) {
+        vec.push_back({
+          x: glyph[i][j].x,
+          y: glyph[i][j].y,
+          onCurve: glyph[i][j].onCurve,
+          endPt: j == glyph[i].length - 1,
+        });
+      }
     }
-    // }
-    input.push_back(vec);
+    input.set(ind, vec);
   }
 
   Module.write_entries(input);

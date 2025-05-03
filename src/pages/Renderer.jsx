@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { glyf, index_map } from "@/lib/atoms";
+import { glyf, index_map, output } from "@/lib/atoms";
 import { useAtom } from "jotai";
 import PointColumn from "@/components/PointColumn";
 import UndoRedoPanel from "@/components/UndoRedoPanel";
@@ -14,6 +14,7 @@ const Renderer = () => {
   const navigate = useNavigate();
   const [indexMap] = useAtom(index_map);
   const [glyphs, setGlyphs] = useAtom(glyf);
+  const [out, setOutput] = useAtom(output);
   const { glyph } = useParams();
 
   //for draw
@@ -30,6 +31,9 @@ const Renderer = () => {
 
   const handleClick = () => {
     setGlyphs((draft) => {
+      draft[glyph] = points;
+    });
+    setOutput((draft) => {
       draft[glyph] = points;
     });
 

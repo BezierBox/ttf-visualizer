@@ -4,6 +4,7 @@ import { atomWithImmer } from "jotai-immer";
 export const fileLoaded = atom(false);
 export const filename = atom("");
 export const glyf = atomWithImmer({});
+export const output = atomWithImmer({});
 export const index_map = atomWithImmer({});
 
 export const glyf_nums = atom((get) => {
