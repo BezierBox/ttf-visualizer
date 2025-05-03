@@ -8,13 +8,17 @@ import GridButtons from "../components/GridButtons";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { glyf, glyf_nums } from "@/lib/atoms";
+import { write_entries_WASM } from "@/lib/wasm/glyph_module";
 
 const Characters = () => {
   const navigate = useNavigate();
+  const [glyphs] = useAtom(glyf);
   const [glyphNums] = useAtom(glyf_nums);
 
   const handleSave = () => {
-    navigate("/");
+    write_entries_WASM(glyphs, () => {
+      navigate("/");
+    });
   };
 
   return (

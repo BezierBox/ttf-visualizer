@@ -24,23 +24,25 @@ export const open_font_WASM = async (file) => {
     if (Module == undefined) {
       reject("Attempted to open font with undefined module");
     }
-  
-    if (!file) { reject("No file was provided") };
-  
+
+    if (!file) {
+      reject("No file was provided");
+    }
+
     const reader = new FileReader();
     reader.onload = function (e) {
       const data = new Uint8Array(e.target.result);
       const filename = `/tmp/${file.name}`;
-  
+
       // Write file to virtual filesystem
       Module.FS.writeFile(filename, data);
-  
+
       // Call your C++ function via ccall
       Module.open_font(filename);
       resolve();
     };
     reader.readAsArrayBuffer(file);
-  })
+  });
 };
 
 export const get_glyph_index_map_WASM = () => {
@@ -127,4 +129,48 @@ export const extract_glyphs_WASM = () => {
     j_map[i] = j_glyph;
   }
   return j_map;
+};
+
+export const write_entries_WASM = (state, next) => {
+  if (Module == undefined) {
+    throw Error("Attempted to open font with undefined module");
+  }
+  const state_keys = Object.keys(state);
+
+  const input = new Module.VectorVectorWBPoint();
+  // for (const key of state_keys) {
+  const glyph = state[36];
+  const vec = new Module.VectorWBPoint();
+  for (let i = 0; i < glyph.length; i++) {
+    for (let j = 0; j < glyph[i].length; j++) {
+      vec.push_back({
+        x: glyph[i][j].x,
+        y: glyph[i][j].y,
+        onCurve: glyph[i][j].onCurve,
+        endPt: j == glyph[i].length - 1,
+      });
+    }
+    // }
+    input.push_back(vec);
+  }
+
+  Module.write_entries(input);
+
+  try {
+    const data = Module.FS.readFile("output.ttf"); // Returns a Uint8Array
+    const blob = new Blob([data], { type: "application/octet-stream" });
+
+    // Create a temporary anchor element to trigger download
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "output.ttf";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    console.error("Failed to download file from WASM FS:", err);
+  }
+
+  next();
 };

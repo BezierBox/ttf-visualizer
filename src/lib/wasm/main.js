@@ -6545,6 +6545,8 @@ var wasmImports = {
   /** @export */
   invoke_viiiiiiiiiiiiiii,
   /** @export */
+  invoke_viij,
+  /** @export */
   invoke_viijii
 };
 var wasmExports = await createWasm();
@@ -6555,10 +6557,11 @@ var __Z16find_glyph_indext = Module['__Z16find_glyph_indext'] = createExportWrap
 var __Z14extract_glyphsv = Module['__Z14extract_glyphsv'] = createExportWrapper('_Z14extract_glyphsv', 1);
 var __Z13extract_glyphi = Module['__Z13extract_glyphi'] = createExportWrapper('_Z13extract_glyphi', 2);
 var __Z26glyph_index_to_unicode_mapv = Module['__Z26glyph_index_to_unicode_mapv'] = createExportWrapper('_Z26glyph_index_to_unicode_mapv', 1);
+var __Z13write_entriesNSt3__26vectorINS0_I7WBPointNS_9allocatorIS1_EEEENS2_IS4_EEEE = Module['__Z13write_entriesNSt3__26vectorINS0_I7WBPointNS_9allocatorIS1_EEEENS2_IS4_EEEE'] = createExportWrapper('_Z13write_entriesNSt3__26vectorINS0_I7WBPointNS_9allocatorIS1_EEEENS2_IS4_EEEE', 1);
 var ___getTypeName = createExportWrapper('__getTypeName', 1);
 var _fflush = createExportWrapper('fflush', 1);
-var _malloc = createExportWrapper('malloc', 1);
 var _strerror = createExportWrapper('strerror', 1);
+var _malloc = createExportWrapper('malloc', 1);
 var _free = createExportWrapper('free', 1);
 var _setThrew = createExportWrapper('setThrew', 2);
 var __emscripten_tempret_set = createExportWrapper('_emscripten_tempret_set', 1);
@@ -6674,6 +6677,17 @@ function invoke_viiiii(index,a1,a2,a3,a4,a5) {
   }
 }
 
+function invoke_iiiii(index,a1,a2,a3,a4) {
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3,a4);
+  } catch(e) {
+    stackRestore(sp);
+    if (!(e instanceof EmscriptenEH)) throw e;
+    _setThrew(1, 0);
+  }
+}
+
 function invoke_i(index) {
   var sp = stackSave();
   try {
@@ -6696,17 +6710,6 @@ function invoke_viiiiii(index,a1,a2,a3,a4,a5,a6) {
   }
 }
 
-function invoke_iiiii(index,a1,a2,a3,a4) {
-  var sp = stackSave();
-  try {
-    return getWasmTableEntry(index)(a1,a2,a3,a4);
-  } catch(e) {
-    stackRestore(sp);
-    if (!(e instanceof EmscriptenEH)) throw e;
-    _setThrew(1, 0);
-  }
-}
-
 function invoke_iiiiiii(index,a1,a2,a3,a4,a5,a6) {
   var sp = stackSave();
   try {
@@ -6722,6 +6725,17 @@ function invoke_v(index) {
   var sp = stackSave();
   try {
     getWasmTableEntry(index)();
+  } catch(e) {
+    stackRestore(sp);
+    if (!(e instanceof EmscriptenEH)) throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_viij(index,a1,a2,a3) {
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1,a2,a3);
   } catch(e) {
     stackRestore(sp);
     if (!(e instanceof EmscriptenEH)) throw e;
