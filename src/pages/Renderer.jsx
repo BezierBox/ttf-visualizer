@@ -44,7 +44,7 @@ const Renderer = () => {
       <h1 className="text-3xl font-bold leading-none">Bezier Glyph Renderer</h1>
       <h2 className="text-xl">Chosen Character: {chars}</h2>
       <div class="flex flex-row h-[calc(100vh-10rem)] max-h-screen justify-center items-center gap-5">
-        <div className="relative h-1/2 flex flex-col items-center justify-center">
+        <div className="relative h-full flex flex-col items-center justify-center">
           <div className="flex flex-row w-full">
             <UndoRedoPanel
               points={points}
@@ -56,7 +56,7 @@ const Renderer = () => {
               className={`ml-auto`}
             />
           </div>
-          
+
           <Canvas
             glyph={points}
             setGlyph={setPoints}
