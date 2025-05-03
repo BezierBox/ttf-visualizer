@@ -149,24 +149,26 @@ const Canvas = ({
       while (i < points.length) {
         const p1 = curr;
         const p2 = points[i % points.length];
-    
-        const p3 = points[(i + 1) % points.length];
+        const p3 = points[(i + 1) % points.length]; 
+      
         const tp1 = transform(p1);
         const tp2 = transform(p2);
         const tp3 = transform(p3);
-    
-        // case: on-curve followed by off-curve followed by on-curve
-        if (!p1.onCurve || !p2.onCurve) {
-          // draw handle from on-curve to control point
+      
+        if (p1.onCurve && !p2.onCurve && p3.onCurve) {
           ctx.beginPath();
           ctx.moveTo(tp1.x, tp1.y);
           ctx.lineTo(tp2.x, tp2.y);
           ctx.strokeStyle = "gray";
           ctx.stroke();
-  
-    
+      
+          ctx.beginPath();
+          ctx.moveTo(tp2.x, tp2.y);
+          ctx.lineTo(tp3.x, tp3.y);
+          ctx.strokeStyle = "gray";
+          ctx.stroke();
         }
-    
+      
         curr = p2;
         i++;
       }
