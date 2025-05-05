@@ -155,18 +155,19 @@ const Canvas = ({
         const tp2 = transform(p2);
         const tp3 = transform(p3);
       
-        if (p1.onCurve && !p2.onCurve && p3.onCurve) {
+        //if (p1.onCurve && !p2.onCurve && p3.onCurve) {
+        if (!p1.onCurve || !p2.onCurve) {
           ctx.beginPath();
           ctx.moveTo(tp1.x, tp1.y);
           ctx.lineTo(tp2.x, tp2.y);
           ctx.strokeStyle = "gray";
           ctx.stroke();
       
-          ctx.beginPath();
+          /* ctx.beginPath();
           ctx.moveTo(tp2.x, tp2.y);
           ctx.lineTo(tp3.x, tp3.y);
           ctx.strokeStyle = "gray";
-          ctx.stroke();
+          ctx.stroke(); */
         }
       
         curr = p2;
